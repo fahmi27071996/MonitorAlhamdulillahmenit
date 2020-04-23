@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -62,8 +63,30 @@ class _MyHomePageState extends State<MyHomePage> {
     });
   }
 
+  Timer _timer;
+int _start = 100;
+
+void startTimer() {
+  const oneSec = const Duration(seconds: 1);
+  _timer = new Timer.periodic(
+    oneSec,
+    (Timer timer) => setState(
+      () {
+        if (_start < 1) {
+          timer.cancel();
+        } else {
+          _start = _start - 1;
+          print("timer : " + _start.toString());
+        }
+      },
+    ),
+  );
+}
+
   @override
   Widget build(BuildContext context) {
+
+    startTimer();
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
