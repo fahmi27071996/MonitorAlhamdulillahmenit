@@ -7,12 +7,16 @@
 import 'package:flutter/material.dart';
 
 import 'package:flutter/widgets.dart';
+import 'package:flutter_echarts/flutter_echarts.dart';
+import 'package:zoom_get_coordinate/View/charts.dart';
+import 'package:zoom_get_coordinate/src/pages/home_page.dart';
+// import 'View/charts.dart';
 
 var touch1 = 0, touch2 = 0;
 var dataTouch = [0.0, 0.0];
 var statusTouch1 = false, statusTouch2 = false;
 var result = [0.0, 0.0];
-int data1, data2;
+int datat1l, datat2l;
 int dataC = 0, cs = 0;
 // int distance = 0;
 List<int> dataTouchInt = [0, 0];
@@ -22,9 +26,27 @@ List<int> deltaTouch = [0, 0];
 var mode = ["Stanby", "Drag 1", "Zoom"];
 var selectMode = "Stanby";
 
-var gKanan = false,gKiri=false;
+var gKanan = false, gKiri = false;
 
-void main() => runApp(MyApp());
+int data_tinggi = 100, min_data = 10;
+var data3 = [10, 20, 30, 40, 50, 60];
+var red = "#db0202";
+
+void main() => runApp(MyApp1());
+
+class MyApp1 extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(fontFamily: 'OpenSans'),
+      initialRoute: 'home',
+      routes: {
+        'home': (BuildContext context) => HomePage(),
+      },
+    );
+  }
+}
 
 /// This Widget is the main application widget.
 class MyApp extends StatelessWidget {
@@ -89,9 +111,9 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           dataTouchInt[1] = dataTouch[1].toInt();
         }
 
-        data1 = dataTouchInt[0];
+        datat1l = dataTouchInt[0];
         result[0] = dataTouchInt[0].toDouble();
-        data2 = dataTouchInt[1];
+        datat2l = dataTouchInt[1];
         result[1] = dataTouchInt[1].toDouble();
 
         print("Touch 1 : " + dataTouchInt[0].toInt().toString());
@@ -109,19 +131,15 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
   void _incrementUp(PointerEvent details) {
     //_updateLocation(details);
     setState(() {
-
-      if(gKiri){
+      if (gKiri) {
         print("Kiri release");
         gKiri = false;
       }
 
-      if(gKanan){
+      if (gKanan) {
         print("Kanan Release");
         gKanan = false;
       }
-
-
-
 
       dataTouch[0] = 0;
       dataTouch[1] = 0;
@@ -129,8 +147,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       deltaTouch[1] = 0;
       dataTouchInt[0] = 0;
       dataTouchInt[1] = 0;
-      data1 = 0;
-      data2 = 0;
+      datat1l = 0;
+      datat2l = 0;
       result[0] = 0;
       result[1] = 0;
       statusTouch2 = false;
@@ -154,28 +172,30 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
         // print("jarak 1 : " + jarak1.toString());
         // print("jarak 2 : " + jarak2.toString());
 
-        if (jarak1 > jarak2) {
+        if (jarak1 > jarak2 && dataTouchInt[0] < x) {
           result[1] = x;
           print("gerak kanan");
           gKanan = true;
-        }
-        if (jarak1 < jarak2) {
-          result[0] = x;
-          gKiri = true;
+        } else {
+          if (jarak1 < jarak2) {
+            result[0] = x;
+            print("gerak kiri");
+            gKiri = true;
+          }
         }
         print("Xnow : " + x.toInt().toString());
-        print("result 1 : " + result[0].toInt().toString());
+        print("result 1 : " + dataTouchInt[0].toInt().toString());
         print("result 2 : " + result[1].toInt().toString());
 
-        deltaTouch[0] = data1.toInt() - dataTouchInt[0].toInt();
-        deltaTouch[1] = dataTouchInt[1].toInt() - data2;
+        deltaTouch[0] = datat1l.toInt() - dataTouchInt[0].toInt();
+        deltaTouch[1] = dataTouchInt[1].toInt() - datat2l.toInt();
 
-        if (result[0] < result[1]) {
-          data1 = result[0].toInt();
-          data2 = result[1].toInt();
+        if ((result[0] < result[1])) {
+          datat1l = result[0].toInt();
+          datat2l = result[1].toInt();
         } else {
-          data2 = result[0].toInt();
-          data1 = result[1].toInt();
+          datat2l = result[0].toInt();
+          datat1l = result[1].toInt();
         }
 
         if (deltaTouch[0] != deltaTouch[1]) {
@@ -206,6 +226,63 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: <Widget>[
+          // Container(
+          //   height: 100,
+          //   width: double.infinity,
+          drawrEcharts(10),
+          // Container(
+          //   width: double.infinity,
+          //   height: data_tinggi.toDouble(),
+          //                       // mainAxisSize: MainAxisSize.max,
+          //                       // child: Column(
+          //                       //   children: <Widget>[
+
+          //     child: Echarts(option: '''
+          //     {
+          //       animation:false,
+          //       height:'$data_tinggi',
+
+          //       grid: {
+          //               left: '0px',
+          //               right: '0px',
+          //               top:'0px'
+          //             },
+
+          //       xAxis: {
+          //               type: 'category',
+
+          //               show: false,
+          //               },
+          //       yAxis: {
+          //           type: 'value',
+          //           show: false,
+          //           min:'$min_data',
+
+          //               },
+
+          //       series: [{
+
+          //           data: [10,20,30,40,50],
+          //           type: 'bar',
+          //           itemStyle: {color: '$red'},
+          //           showBackground: true,
+          //           backgroundStyle: {
+          //               color: '#ffffff'
+          //           }
+
+          //       }]
+
+          //     }
+
+          //     '''),
+
+          //                       //  ],
+
+          //                       // ),,
+          //                       // onTap: () {}, // Text(item,textAlign: TextAlign.left,style: TextStyle(fontSize: 15.0),
+          //                     ),
+          //),
+
           Text("Mode : $selectMode\n\n"),
           Text("As : " +
               dataTouchInt[0].toString() +
@@ -215,7 +292,8 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           Text("\nCs : " + dataTouch[0].round().toString()),
           Text("\ndC : " + dataC.toString()),
 
-          Text("\nAn : " + data1.toString() + "   Bn : " + data2.toString()),
+          Text(
+              "\nAn : " + datat1l.toString() + "   Bn : " + datat2l.toString()),
 
           Text("\n\ndA : " +
               deltaTouch[0].toString() +
@@ -226,7 +304,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
           // Text(),
 
           ConstrainedBox(
-            constraints: BoxConstraints.tight(Size(double.infinity, 50.0)),
+            constraints: BoxConstraints.tight(Size(double.infinity, 100.0)),
             child: Listener(
               onPointerDown: _incrementDown,
               onPointerMove: _updateLocation,
@@ -234,20 +312,6 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget> {
               // onPointerEnter: enter,
               child: Container(
                 color: Colors.lightBlueAccent,
-                // child: Column(
-                //   mainAxisAlignment: MainAxisAlignment.center,
-                //   children: <Widget>[
-                //     Text(
-                //         'You have pressed or released in this area this many times:'),
-                //     Text(
-                //       '$_downCounter presses\n$_upCounter releases',
-                //       style: Theme.of(context).textTheme.display1,
-                //     ),
-                //     Text(
-                //       'The cursor is here: (${x.toStringAsFixed(2)}, ${y.toStringAsFixed(2)})',
-                //     ),
-                //   ],
-                // ),
               ),
             ),
           ),
